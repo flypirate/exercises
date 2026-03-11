@@ -22,8 +22,6 @@ int check_valid(int *tablero, int size, int col)
 
 void nqueens(int *tablero, int size, int col, int fil)
 {
-	if (fil == size)
-		return ;
 	if (col == size)
 	{
 		int i = 0;
@@ -37,13 +35,12 @@ void nqueens(int *tablero, int size, int col, int fil)
 		printf("\n");
 		return ;
 	}	
+	if (fil == size)
+		return ;
+	tablero[col] = fil;
 	if (check_valid(tablero, size, col))
-	{
-		tablero[col] = fil;
 		nqueens(tablero, size, col + 1, 0);
-	}
 	nqueens(tablero, size, col, fil + 1);
-	printf("Aqui");
 }
 
 int main(int argc, char **argv)
