@@ -5,87 +5,67 @@
 #include <string.h> //for strchr, memcpy.
 
 #ifndef BUFFER_SIZE
-# define BUFFER_SIZE 2
+# define BUFFER_SIZE 42
 #endif
+
+char *ft_strdup(char *string, int c)
+{
+	int i = 0;
+	char *ret;
+	if (!string)
+		return NULL;
+	ret = malloc(sizeof(char) * (c + 1));
+	if (!ret)
+		return NULL;
+	while (i < c)
+	{
+		ret[i] = string[i];
+		i++;
+	}
+	ret[i] = '\0';
+	return (ret);		
+}
 
 char *get_next_line(int fd)
 {
-	static char b[BUFFER_SIZE + 1];
-	static char *stash;
-	char *line = NULL;
-	char *nl = NULL;
-	int bytes = 0;
-	int i = 0;
-	int j;
-	int k = 0;
+	static char buf[BUFFER_SIZE + 1];
+	static char line[7000];
+	char *ret = NULL;
+	static int bytes;
+	static int i;
+	static int j;
 
-	line = malloc(sizeof(char) * (BUFFER_SIZE + 1));
-	if (!line)
-		return (NULL);
-	line[0] = '\0';
-	if (!stash)
-	{
-		stash = malloc(sizeof(char) * (BUFFER_SIZE + 1));
-		if (!stash)
-			return (NULL);
-		stash[0] = '\0';
-	}
 	while (1)
 	{
-		j = 0;
-		if (stash[0])
+		if (j >= bytes)
 		{
-			memmove(line, stash, strlen(stash));
-			stash[0] = '\0';
-			i = strlen(line);
-		}
-		bytes = read(fd, b, BUFFER_SIZE);
-		if (bytes < 1)
-			break;
-		b[bytes] = '\0';
-		while (j < bytes)
-		{
-			line = realloc(line, sizeof(char) * (BUFFER_SIZE + 1 + strlen(line)));
-			if (!line)
-				return (free(stash), NULL);
-			line[i++] = b[j++];
-			if (line[i - 1] == '\n')
+			j = 0;
+			bytes = read(fd, buf, BUFFER_SIZE);
+			buf[bytes] = '\0';
+			if (bytes < 1)
 				break;
 		}
-		break;
+		line[i++] = buf[j++];
+		if (line[i - 1] == '\n')
+			break;
 	}
-	line[i] = '\0';
-	if (nl = strchr(line, '\n'), nl)
-	{
-		while (j < bytes)
-			stash[k++] = b[j++];
-		stash[k] = '\0';
-		nl++;
-		*nl = '\0';
-	}
-	else if (bytes == -1)
-	{
-		if (line)
-			free(line);
+	if (bytes == -1)
 		return (NULL);
-	}
-	else if (bytes == 0 && stash[0])
+	if (bytes == 0 && i == 0)
+		return (NULL);
+	if (i > 0)
 	{
-		memmove(line, stash, strlen(stash));
-		line[strlen(stash)] = '\0';
-		free(stash);
-		stash = NULL;
+		ret = ft_strdup(line, i);
+		i = 0;
+		return (ret);
 	}
-	else if (bytes == 0 && !stash[0])
-		return NULL;
-	return (line);
+	return (NULL);
 }
 
 int main(int argc, char **argv)
 {
 	int fd;
 	char *line;
-	int i = 0;
 	if (argc != 2)
 		return (1);
 	fd = open(argv[1], 0);
