@@ -5,7 +5,7 @@
 #include <string.h> //for strchr, memcpy.
 
 #ifndef BUFFER_SIZE
-# define BUFFER_SIZE 42
+# define BUFFER_SIZE 2
 #endif
 
 char *ft_strdup(char *string, int c)
@@ -49,9 +49,7 @@ char *get_next_line(int fd)
 		if (line[i - 1] == '\n')
 			break;
 	}
-	if (bytes == -1)
-		return (NULL);
-	if (bytes == 0 && i == 0)
+	if (bytes == -1 || (bytes == 0 && i == 0))
 		return (NULL);
 	if (i > 0)
 	{
