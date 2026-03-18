@@ -12,35 +12,34 @@ hint: the empty set is a subset of anyset.*/
 #include <stdlib.h>
 #include <stdio.h>
 
-
 void powerset(int n, int len, int *subset, int *buf, int sum, int buflen, int sublen)
 {
 	if (sublen > len)
 		return;
 	if (sum == n)
 	{
-		int k = 0;
-		//printf("buflen = %d\n", buflen);
-		while (k < buflen)
+		if (sublen == len)
 		{
-			printf("%d", buf[k]);
-			if (k < buflen - 1)
-				printf(" ");
-			k++;
+			int k = 0;
+			while (k < buflen)
+			{
+				printf("%d", buf[k]);
+				if (k < buflen - 1)
+					printf(" ");
+				k++;
+			}
+			printf("\n");
+			return;
 		}
-		printf("\n");
-		return;
 	}
-	sum += subset[sublen];
-	if (sum > n)
+	/*if (sum > n)
 	{
 		powerset(n, len, subset, buf, sum, buflen, sublen + 1);
 		return ;
-	}
-	buf[buflen++] = subset[sublen++];
-	powerset(n, len, subset, buf, sum, buflen, sublen);
-	sublen--;
-	buflen--;
+	}*/
+	sum += subset[sublen];
+	buf[buflen] = subset[sublen];
+	powerset(n, len, subset, buf, sum, buflen + 1, sublen + 1);
 	sum -= subset[sublen];
 	powerset(n, len, subset, buf, sum, buflen, sublen + 1);
 }
@@ -48,11 +47,11 @@ void powerset(int n, int len, int *subset, int *buf, int sum, int buflen, int su
 
 int main(int argc, char **argv)
 {
-	if (argc < 3)
+	if (argc < 2)
 		return (1);
 	int len = argc - 2;
 	int subset[len];
-	int *buf;
+	int buf[len];
 	int i = 2;
 	int j = 0;
 	int n = atoi(argv[1]);
@@ -64,10 +63,6 @@ int main(int argc, char **argv)
 		i++;
 		j++;
 	}
-	i = 0;
-	buf = malloc(sizeof(int) * len);
-	if (!buf)
-		return (1);
 	powerset(n, len, subset, buf, 0, 0, 0);
 	return (0);
 }
