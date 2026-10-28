@@ -27,6 +27,7 @@ int main()
 */
 
 #include <unistd.h>
+#include <stdio.h>
 #include <sys/types.h>
 #include <stdlib.h>
 
@@ -49,21 +50,45 @@ int ft_popen(const char *file, char *const argv[], char type)
 		close(fd[1]);
 		return (-1);
 	}
-
+	if (forkresult == 0)
+	{
+		if (type == 'r')
+		{
+			close(fd[0]);
+			dup2(fd[1], STDOUT_FILENO);
+			close(fd[1]);
+			execvp(file, argv);
+			exit(1);
+		}
+		else
+		{
+			close(fd[1]);
+			dup2(fd[0], STDIN_FILENO);
+			close(fd[0]);
+			execvp(file, argv);
+			exit(1);
+		}		
+	}
 	if (type == 'r')
-		return (fd[0]);
+		return (close(fd[1]), fd[0]);
 	else
-		return (fd[1]);
+		return (close(fd[0]), fd[1]);
 }
 
 
 int	main() {
 	int fd;
-	char *line;
+	char buf[5];
+	size_t count = 5;
+	int	bytes;
 
-	int	fd = ft_popen("ls", (char *const []){"ls", NULL}, 'r');
-	while ((line = get_next_line(fd)))
-        ft_putstr(line);
+	fd = ft_popen("ls", (char *const []){"ls", NULL}, 'r');
+	while (bytes = read(fd, buf, count), bytes > 0)
+	{
+		//printf("bytes read = %d\n", bytes);
+        write(fd, buf, 5);
+	}	
+	close(fd);
     return (0);
 }
 
